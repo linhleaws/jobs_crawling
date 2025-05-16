@@ -1,0 +1,15 @@
+pandas
+beautifulsoup4
+requests
+selenium
+selenium_stealth
+undetected_chromedriver
+dotenv
+webdriver_manager
+lxml
+
+# send message to slack
+slack_sdk
+
+# write data to S3
+boto3
