@@ -1,9 +1,3 @@
-import os
-import smtplib
-from email import encoders
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import time
 
 import pandas as pd
@@ -16,11 +10,6 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 import undetected_chromedriver as uc #bypass Cloudflare
 
-from slack_sdk import WebClient
-
-import boto3
-
-from io import StringIO
 global total_jobs
 
 
@@ -63,13 +52,13 @@ def search_jobs(driver, country, job_position, job_location, date_posted):
         job_count_element = driver.find_element(By.XPATH,
                                                 '//div[starts-with(@class, "jobsearch-JobCountAndSortPane-jobCount")]')
         total_jobs = job_count_element.find_element(By.XPATH, './span').text
-        message = f"{total_jobs} found"
-        send_message_slack(message)
+        # message = f"{total_jobs} found"
+        print(f"{total_jobs} found")
     except NoSuchElementException:
         print("No job count found")
         total_jobs = "Unknown"
 
-    driver.save_screenshot('screenshot.png')
+    # driver.save_screenshot('screenshot.png')
     return full_url
 
 
@@ -176,57 +165,3 @@ def clean_data(df):
             pass
     df['employer_active'] = df['employer_active'].apply(posted)
     return df
-
-
-# def save_csv(df, job_position, job_location):
-#     # def get_user_desktop_path():
-#     #     home_dir = os.path.expanduser("~")
-#     #     desktop_path = os.path.join(home_dir, "Desktop")
-#     #     return desktop_path
-
-#     def get_project_path():
-#         project_path = os.path.dirname(os.path.abspath(__file__))
-#         data_path = os.path.join(project_path, 'data')
-#         return data_path
-#     data_path = get_project_path()
-#     file_path = os.path.join(data_path, '{}_{}'.format(job_position, job_location))
-#     # file_path = './data'
-#     csv_file = '{}.csv'.format(file_path)
-#     df.to_csv('{}.csv'.format(file_path), index=False)
-
-#     return csv_file
-
-
-def send_message_slack(message):
-    token = os.getenv('SLACK_TOKEN')
-    # Set up a WebClient with the Slack OAuth token
-    client = WebClient(token=token)
-
-    # Send a message
-    client.chat_postMessage(
-        channel="indeed_de_notify", 
-        text=message, 
-        username="Indeed_bot"
-)
-    
-
-def write_to_s3(df, job_position, job_location):
-    file_name = f"{job_position}_{job_location}.csv"
-    bucket_name = 'linhltt-indeed-jobs'
-    # Use credentials from environment
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        region_name=os.getenv("AWS_DEFAULT_REGION")
-)
-
-    # Convert to CSV in-memory
-    csv_buffer = StringIO()
-    df.to_csv(csv_buffer, index=False)
-
-    # Upload to S3
-    s3 = boto3.client("s3")
-    s3.put_object(Bucket=bucket_name, Key=f"uploads/{file_name}", Body=csv_buffer.getvalue())
-
-

@@ -1,7 +1,10 @@
 import os
-from job_scraper_utils import *
+from utils.job_scraper_utils import *
 from dotenv import load_dotenv
-import boto3
+
+from utils.slack_utils import send_message_slack
+from utils.s3_utils import write_to_s3
+from utils.job_scraper_utils import *
 
 load_dotenv()
 
@@ -24,6 +27,7 @@ def main():
             Check the URL: {full_url}
             """
             send_message_slack(message)
+            driver.quit()
         else:
             cleaned_df = clean_data(df)
     finally:
