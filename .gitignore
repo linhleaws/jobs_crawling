@@ -1,10 +1,5 @@
-.env
-venv/
+scraper_v1/.env
+scraper_v1/venv/
 data/
 __pycache__/
-
-config/
-logs/
-plugins/
-
 scraper_v2/
