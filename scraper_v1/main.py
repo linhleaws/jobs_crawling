@@ -1,5 +1,4 @@
 import os
-from utils.job_scraper_utils import *
 from dotenv import load_dotenv
 
 from utils.slack_utils import send_message_slack

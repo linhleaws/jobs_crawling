@@ -3,3 +3,8 @@ venv/
 data/
 __pycache__/
 
+config/
+logs/
+plugins/
+
+scraper_v2/
